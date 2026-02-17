@@ -7,18 +7,27 @@
 </head>
 <body>
 
-  <h1>Pacotes de Viagem</h1>
+  <!-- Header com imagem e logo -->
+  <header class="hero-header">
+    <img src="images/casal-selfie.jpg" alt="Casal selfie" class="hero-image">
+    <div class="hero-overlay">
+      <img src="images/jlb-25-anos.png" alt="JLB 25 anos" class="hero-logo">
+      <h1>Explore os melhores destinos com a JLB Viagens</h1>
+    </div>
+  </header>
 
-  <div id="viagens-container"></div>
+  <!-- Container dos pacotes -->
+  <section class="viagens-section">
+    <div id="viagens-container"></div>
+  </section>
+
+  <!-- Modal Galeria -->
+  <div id="gallery-modal" class="modal">
+    <span class="close">&times;</span>
+    <img class="modal-content" id="modal-img">
+    <div id="caption"></div>
+  </div>
 
   <script src="script.js"></script>
-<div id="modal" class="modal" onclick="fecharModal()">
-  <span class="fechar">&times;</span>
-  <button class="anterior" onclick="event.stopPropagation(); imagemAnterior()">❮</button>
-  <img id="modal-img">
-  <button class="proxima" onclick="event.stopPropagation(); proximaImagem()">❯</button>
-</div>
-
-
 </body>
 </html>

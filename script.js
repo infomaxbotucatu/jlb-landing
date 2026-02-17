@@ -1,86 +1,50 @@
-// ===========================
-// Carregar viagens da API
-// ===========================
-async function carregarViagens() {
-  try {
-    const response = await fetch("/api/viagens");
-    const viagens = await response.json();
+const viagensContainer = document.getElementById("viagens-container");
+const modal = document.getElementById("gallery-modal");
+const modalImg = document.getElementById("modal-img");
+const captionText = document.getElementById("caption");
+const span = document.getElementsByClassName("close")[0];
 
-    const container = document.getElementById("viagens-container");
-    container.innerHTML = "";
-
-    viagens
-      .filter(v => v["Ativo"]?.toLowerCase() === "sim")
-      .forEach(viagem => {
+// Buscar dados da planilha (API)
+fetch("/api/viagens.js")
+  .then(res => res.json())
+  .then(data => {
+    data.forEach(viagem => {
+      if(viagem.Ativo === "SIM"){
+        const card = document.createElement("div");
+        card.classList.add("viagem-card");
 
         // Imagem principal
-        const imagemPrincipal = viagem["Imagem Principal"]?.trim() || "/imagens/padrao.jpg";
+        const img = document.createElement("img");
+        img.src = viagem["Imagem Principal"];
+        img.alt = viagem.Destino;
+        img.onclick = () => openModal(viagem["Galeria"].split(",")[0]);
+        card.appendChild(img);
 
-        // Galeria
-        const galeriaArray = viagem["Galeria"]
-          ? viagem["Galeria"].split(",").map(img => img.trim())
-          : [];
+        // Conteúdo
+        const title = document.createElement("h3");
+        title.textContent = viagem.Destino;
+        card.appendChild(title);
 
-        // Todas as imagens (principal + galeria)
-        const todasImagens = [imagemPrincipal, ...galeriaArray];
+        const desc = document.createElement("p");
+        desc.textContent = viagem["Descrição Curta"];
+        card.appendChild(desc);
 
-        // HTML das miniaturas
-        const galeriaHTML = todasImagens.map((img, index) => `
-          <img src="${img}" 
-               class="miniatura" 
-               onclick="abrirModal(${index}, ${JSON.stringify(todasImagens).replace(/"/g, '&quot;')})">
-        `).join("");
+        const btn = document.createElement("a");
+        btn.href = `https://wa.me/5514?text=${encodeURIComponent(viagem["Mensagem WhatsApp"])}`;
+        btn.target = "_blank";
+        btn.classList.add("whatsapp-btn");
+        btn.textContent = "WhatsApp";
+        card.appendChild(btn);
 
-        // Montar card
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <img src="${imagemPrincipal}" class="principal" alt="${viagem["Destino"]}">
-          <h2>${viagem["Destino"]}</h2>
-          <p>${viagem["Descrição Curta"]}</p>
-          <div class="galeria">${galeriaHTML}</div>
-          <a href="https://wa.me/?text=${encodeURIComponent(viagem["Mensagem WhatsApp"] || `Tenho interesse em ${viagem["Destino"]}`)}" target="_blank" class="botao">
-            Falar no WhatsApp
-          </a>
-        `;
+        viagensContainer.appendChild(card);
+      }
+    });
+  });
 
-        container.appendChild(card);
-      });
-
-  } catch (error) {
-    console.error("Erro ao carregar viagens:", error);
-  }
+// Modal
+function openModal(imgSrc){
+  modal.style.display = "block";
+  modalImg.src = imgSrc;
 }
-
-// ===========================
-// Modal de Galeria
-// ===========================
-let imagensModal = [];
-let indiceAtual = 0;
-
-function abrirModal(indice, imagens) {
-  imagensModal = imagens;
-  indiceAtual = indice;
-  const modal = document.getElementById("modal");
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-  modal.style.display = "flex";
-}
-
-function fecharModal() {
-  document.getElementById("modal").style.display = "none";
-}
-
-function proximaImagem() {
-  indiceAtual = (indiceAtual + 1) % imagensModal.length;
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-}
-
-function imagemAnterior() {
-  indiceAtual = (indiceAtual - 1 + imagensModal.length) % imagensModal.length;
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-}
-
-// ===========================
-// Executar carregamento
-// ===========================
-carregarViagens();
+span.onclick = function() { modal.style.display = "none"; }
+window.onclick = function(event) { if(event.target == modal){ modal.style.display = "none"; } }

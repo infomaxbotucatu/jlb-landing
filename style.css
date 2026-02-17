@@ -1,81 +1,104 @@
-.card {
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+}
+
+/* Header */
+.hero-header {
+  position: relative;
+  text-align: center;
+  color: white;
+}
+.hero-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+}
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.4);
+}
+.hero-logo {
+  width: 150px;
+  margin-bottom: 10px;
+}
+.hero-overlay h1 {
+  font-size: 2.2rem;
+}
+
+/* Viagens */
+.viagens-section {
+  padding: 40px 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.viagem-card {
   background: #fff;
   border-radius: 10px;
-  padding: 15px;
-  margin-bottom: 20px;
-  box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+  margin: 15px;
+  width: 300px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  overflow: hidden;
+  text-align: center;
+  transition: transform 0.2s;
 }
-
-.principal {
+.viagem-card:hover {
+  transform: translateY(-5px);
+}
+.viagem-card img {
   width: 100%;
-  height: 250px;
+  height: 180px;
   object-fit: cover;
-  border-radius: 8px;
+}
+.viagem-card h3 {
+  margin: 10px 0 5px;
+}
+.viagem-card p {
+  margin: 5px 15px 10px;
+}
+.viagem-card a.whatsapp-btn {
+  display: inline-block;
+  margin: 10px 0 15px;
+  padding: 8px 15px;
+  background-color: #25D366;
+  color: white;
+  border-radius: 5px;
+  text-decoration: none;
 }
 
-.galeria {
-  display: flex;
-  gap: 6px;
-  margin-top: 10px;
-}
-
-.miniatura {
-  width: 60px;
-  height: 60px;
-  object-fit: cover;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
+/* Modal */
 .modal {
   display: none;
   position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.9);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
+  z-index: 1000;
+  padding-top: 60px;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  background-color: rgba(0,0,0,0.8);
 }
-
-.modal img {
+.modal-content {
+  margin: auto;
+  display: block;
   max-width: 90%;
-  max-height: 80%;
-  border-radius: 10px;
 }
-
-.fechar {
+.close {
   position: absolute;
   top: 20px;
-  right: 40px;
-  font-size: 40px;
+  right: 35px;
   color: #fff;
-  cursor: pointer;
-}
-
-.anterior, .proxima {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
   font-size: 40px;
-  background: none;
-  border: none;
-  color: #fff;
   cursor: pointer;
-  padding: 20px;
-}
-
-.anterior {
-  left: 20px;
-}
-
-.proxima {
-  right: 20px;
-}
-
-.miniatura {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  cursor: pointer;
-  border-radius: 6px;
 }
