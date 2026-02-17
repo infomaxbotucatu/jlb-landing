@@ -1,36 +1,39 @@
-async function carregarViagens() {
-  try {
-    const response = await fetch("/api/viagens");
-    const viagens = await response.json();
+fetch("/api/viagens")
+  .then(res => res.json())
+  .then(data => {
+    const container = document.getElementById("viagens");
 
-    const container = document.getElementById("viagens-container");
-    container.innerHTML = "";
-
-    viagens
-      .filter(v => v["Ativo"]?.toLowerCase() === "sim")
+    data
+      .filter(v => v.Ativo === "SIM")
       .forEach(viagem => {
 
-        const whatsappNumero = "5514999999999"; // coloque o número real aqui
-        const mensagem = encodeURIComponent(viagem["Mensagem WhatsApp"]);
+        const imagemPrincipal = viagem["Imagem Principal"]?.trim() !== ""
+          ? viagem["Imagem Principal"]
+          : "/imagens/padrao.jpg";
 
-        const card = `
-          <div class="card">
-            <img src="${viagem["Imagem Principal"]}" alt="${viagem["Destino"]}" />
-            <h3>${viagem["Destino"]}</h3>
-            <p>${viagem["Descrição Curta"]}</p>
-            <p><strong>${viagem["Data Início"]} - ${viagem["Data Fim"]}</strong></p>
-            <a class="botao" href="https://wa.me/${whatsappNumero}?text=${mensagem}" target="_blank">
-              Falar no WhatsApp
-            </a>
+        const galeriaArray = viagem["Galeria"]
+          ? viagem["Galeria"].split(",").map(img => img.trim())
+          : [];
+
+        const galeriaHTML = galeriaArray.map(img => `
+          <img src="${img}" class="miniatura">
+        `).join("");
+
+        const card = document.createElement("div");
+        card.className = "card";
+
+        card.innerHTML = `
+          <img src="${imagemPrincipal}" class="principal" alt="${viagem.Destino}">
+          <h2>${viagem.Destino}</h2>
+          <p>${viagem["Descrição Curta"]}</p>
+          <div class="galeria">
+            ${galeriaHTML}
           </div>
+          <a href="https://wa.me/SEUNUMERO?text=${encodeURIComponent(viagem["Mensagem WhatsApp"])}" target="_blank">
+            Falar no WhatsApp
+          </a>
         `;
 
-        container.innerHTML += card;
+        container.appendChild(card);
       });
-
-  } catch (error) {
-    console.error("Erro ao carregar viagens:", error);
-  }
-}
-
-carregarViagens();
+  });
