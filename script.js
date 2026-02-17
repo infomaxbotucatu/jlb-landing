@@ -1,50 +1,56 @@
-const viagensContainer = document.getElementById("viagens-container");
-const modal = document.getElementById("gallery-modal");
-const modalImg = document.getElementById("modal-img");
-const captionText = document.getElementById("caption");
-const span = document.getElementsByClassName("close")[0];
+const viagensContainer = document.getElementById('viagens-container');
 
-// Buscar dados da planilha (API)
-fetch("/api/viagens.js")
-  .then(res => res.json())
-  .then(data => {
-    data.forEach(viagem => {
-      if(viagem.Ativo === "SIM"){
-        const card = document.createElement("div");
-        card.classList.add("viagem-card");
+// Substitua pelo link JSON da sua planilha
+const PLANILHA_JSON = "https://spreadsheets.google.com/feeds/list/1IEcz1DiCJlTOrx1PCpUYFf9DzugD2YI6z0g4U50ERK0/od6/public/values?alt=json";
 
-        // Imagem principal
-        const img = document.createElement("img");
-        img.src = viagem["Imagem Principal"];
-        img.alt = viagem.Destino;
-        img.onclick = () => openModal(viagem["Galeria"].split(",")[0]);
-        card.appendChild(img);
+async function carregarViagens() {
+  try {
+    const response = await fetch(PLANILHA_JSON);
+    const data = await response.json();
 
-        // Conteúdo
-        const title = document.createElement("h3");
-        title.textContent = viagem.Destino;
-        card.appendChild(title);
+    // A API retorna os valores em feed.entry
+    const entries = data.feed.entry;
 
-        const desc = document.createElement("p");
-        desc.textContent = viagem["Descrição Curta"];
-        card.appendChild(desc);
+    const viagens = entries.map(e => ({
+      ID: e.gsx$id.$t,
+      Ativo: e.gsx$ativo.$t,
+      Categoria: e.gsx$categoria.$t,
+      Destino: e.gsx$destino.$t,
+      DataInicio: e.gsx$datainicio.$t,
+      DataFim: e.gsx$datafim.$t,
+      Descricao: e.gsx$descricaocurta.$t,
+      Imagem: e.gsx$imagemprincipal.$t,
+      Galeria: e.gsx$galeria.$t,
+      MensagemWhatsApp: e.gsx$mensagemwhatsapp.$t,
+      Destaque: e.gsx$destaque.$t
+    }));
 
-        const btn = document.createElement("a");
-        btn.href = `https://wa.me/5514?text=${encodeURIComponent(viagem["Mensagem WhatsApp"])}`;
-        btn.target = "_blank";
-        btn.classList.add("whatsapp-btn");
-        btn.textContent = "WhatsApp";
-        card.appendChild(btn);
+    viagens.forEach(createCard);
 
-        viagensContainer.appendChild(card);
-      }
-    });
-  });
-
-// Modal
-function openModal(imgSrc){
-  modal.style.display = "block";
-  modalImg.src = imgSrc;
+  } catch (error) {
+    console.error("Erro ao carregar os pacotes:", error);
+    viagensContainer.innerHTML = "<p>Não foi possível carregar os pacotes no momento.</p>";
+  }
 }
-span.onclick = function() { modal.style.display = "none"; }
-window.onclick = function(event) { if(event.target == modal){ modal.style.display = "none"; } }
+
+function createCard(viagem) {
+  if (viagem.Ativo !== "SIM") return;
+
+  const card = document.createElement('div');
+  card.classList.add('viagem-card');
+
+  card.innerHTML = `
+    <img src="${viagem.Imagem}" alt="${viagem.Destino}">
+    <div class="info">
+      <h2>${viagem.Destino}</h2>
+      <p>${viagem.Descricao}</p>
+      <p>${viagem.DataInicio} - ${viagem.DataFim}</p>
+      <a href="https://wa.me/55${viagem.MensagemWhatsApp}" target="_blank" class="whatsapp-btn">WhatsApp</a>
+    </div>
+  `;
+
+  viagensContainer.appendChild(card);
+}
+
+// Carrega as viagens automaticamente
+carregarViagens();
