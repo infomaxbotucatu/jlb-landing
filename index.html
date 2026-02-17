@@ -12,5 +12,13 @@
   <div id="viagens-container"></div>
 
   <script src="script.js"></script>
+<div id="modal" class="modal" onclick="fecharModal()">
+  <span class="fechar">&times;</span>
+  <button class="anterior" onclick="event.stopPropagation(); imagemAnterior()">❮</button>
+  <img id="modal-img">
+  <button class="proxima" onclick="event.stopPropagation(); proximaImagem()">❯</button>
+</div>
+
+
 </body>
 </html>
