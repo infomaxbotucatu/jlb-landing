@@ -1,66 +1,34 @@
-fetch("/api/viagens")
-  .then(res => res.json())
-  .then(data => {
+async function carregarViagens() {
+  try {
+    const response = await fetch("/api/viagens");
+    const viagens = await response.json();
+
     const container = document.getElementById("viagens-container");
+    container.innerHTML = "";
 
-
-    data
-      .filter(v => v.Ativo === "SIM")
+    viagens
+      .filter(v => v["Ativo"]?.toLowerCase() === "sim")
       .forEach(viagem => {
+        const imagem = viagem["Imagem Principal"]?.trim() || "/imagens/padrao.jpg";
+        const mensagem = encodeURIComponent(viagem["Mensagem WhatsApp"] || `Tenho interesse em ${viagem["Destino"]}`);
 
-        const imagemPrincipal = viagem["Imagem Principal"]?.trim() !== ""
-          ? viagem["Imagem Principal"]
-          : "/imagens/padrao.jpg";
-
-        const galeriaArray = viagem["Galeria"]
-          ? viagem["Galeria"].split(",").map(img => img.trim())
-          : [];
-
-        const todasImagens = [imagemPrincipal, ...galeriaArray];
-
-        const galeriaHTML = todasImagens.map((img, index) => `
-          <img src="${img}" 
-               class="miniatura" 
-               onclick="abrirModal(${index}, ${JSON.stringify(todasImagens).replace(/"/g, '&quot;')})">
-        `).join("");
-
-        const card = document.createElement("div");
-        card.className = "card";
-
-        card.innerHTML = `
-          <img src="${imagemPrincipal}" class="principal">
-          <h2>${viagem.Destino}</h2>
-          <p>${viagem["Descrição Curta"]}</p>
-          <div class="galeria">${galeriaHTML}</div>
+        const card = `
+          <div class="card">
+            <img src="${imagem}" alt="${viagem["Destino"]}">
+            <h3>${viagem["Destino"]}</h3>
+            <p>${viagem["Descrição Curta"]}</p>
+            <p><strong>${viagem["Data Início"]} - ${viagem["Data Fim"]}</strong></p>
+            <a href="https://wa.me/${viagem["Mensagem WhatsApp"]}?text=${mensagem}" class="botao" target="_blank">
+              Falar no WhatsApp
+            </a>
+          </div>
         `;
-
-        container.appendChild(card);
+        container.innerHTML += card;
       });
-  });
 
-
-// ===== MODAL =====
-
-let imagensModal = [];
-let indiceAtual = 0;
-
-function abrirModal(indice, imagens) {
-  imagensModal = imagens;
-  indiceAtual = indice;
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-  document.getElementById("modal").style.display = "flex";
+  } catch (error) {
+    console.error("Erro ao carregar viagens:", error);
+  }
 }
 
-function fecharModal() {
-  document.getElementById("modal").style.display = "none";
-}
-
-function proximaImagem() {
-  indiceAtual = (indiceAtual + 1) % imagensModal.length;
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-}
-
-function imagemAnterior() {
-  indiceAtual = (indiceAtual - 1 + imagensModal.length) % imagensModal.length;
-  document.getElementById("modal-img").src = imagensModal[indiceAtual];
-}
+carregarViagens();
