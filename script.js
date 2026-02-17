@@ -10,20 +10,15 @@ async function carregarViagens() {
       .filter(v => v["Ativo"]?.toLowerCase() === "sim")
       .forEach(viagem => {
 
-        const destaqueBadge = viagem["Destaque"]?.toLowerCase() === "sim"
-          ? `<span class="badge">Destaque</span>`
-          : "";
-
-        const whatsappNumero = "55SEUNUMEROAQUI"; // coloque o número fixo da agência
-        const mensagem = encodeURIComponent(viagem["Mensagem WhatsApp"] || `Olá! Tenho interesse em ${viagem["Destino"]}`);
+        const whatsappNumero = "5514999999999"; // coloque o número real aqui
+        const mensagem = encodeURIComponent(viagem["Mensagem WhatsApp"]);
 
         const card = `
           <div class="card">
-            ${destaqueBadge}
             <img src="${viagem["Imagem Principal"]}" alt="${viagem["Destino"]}" />
             <h3>${viagem["Destino"]}</h3>
             <p>${viagem["Descrição Curta"]}</p>
-            <small>${viagem["Data Início"]} - ${viagem["Data Fim"]}</small>
+            <p><strong>${viagem["Data Início"]} - ${viagem["Data Fim"]}</strong></p>
             <a class="botao" href="https://wa.me/${whatsappNumero}?text=${mensagem}" target="_blank">
               Falar no WhatsApp
             </a>
