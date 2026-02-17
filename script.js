@@ -27,14 +27,12 @@ modal.appendChild(closeBtn);
 
 document.body.appendChild(modal);
 
-// Fechar modal
 closeBtn.onclick = () => modal.style.display = "none";
 window.onclick = e => { if(e.target === modal) modal.style.display = "none"; }
 
 // URL JSON da sua planilha publicada
 const PLANILHA_JSON = "https://spreadsheets.google.com/feeds/list/1IEcz1DiCJlTOrx1PCpUYFf9DzugD2YI6z0g4U50ERK0/od6/public/values?alt=json";
 
-// Função para criar cards
 function createCard(viagem){
   if(viagem.Ativo !== "SIM") return;
 
@@ -51,7 +49,6 @@ function createCard(viagem){
     </div>
   `;
 
-  // Clique na imagem abre modal com a primeira foto da galeria
   card.querySelector('img').onclick = () => {
     const galeria = viagem.Galeria ? viagem.Galeria.split(",") : [viagem.Imagem];
     modalImg.src = galeria[0];
@@ -61,7 +58,6 @@ function createCard(viagem){
   viagensContainer.appendChild(card);
 }
 
-// Função principal: carregar dados da planilha
 async function carregarViagens(){
   try {
     const response = await fetch(PLANILHA_JSON);
@@ -90,7 +86,6 @@ async function carregarViagens(){
     console.error("Não foi possível carregar os pacotes da planilha:", error);
     viagensContainer.innerHTML = "<p>Não foi possível carregar os pacotes da planilha. Mostrando exemplos locais:</p>";
 
-    // Exemplo local de fallback
     const exemplos = [
       {
         Ativo: "SIM",
@@ -117,5 +112,4 @@ async function carregarViagens(){
   }
 }
 
-// Executa ao carregar
 carregarViagens();
