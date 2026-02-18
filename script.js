@@ -1,6 +1,6 @@
 const viagensContainer = document.getElementById('viagens-container');
 
-// Criação do modal
+// Modal para galeria
 const modal = document.createElement('div');
 const modalImg = document.createElement('img');
 const closeBtn = document.createElement('span');
@@ -34,14 +34,10 @@ modal.appendChild(modalImg);
 modal.appendChild(closeBtn);
 document.body.appendChild(modal);
 
-// Fechar modal
 closeBtn.onclick = () => modal.style.display = "none";
 window.onclick = e => { if(e.target === modal) modal.style.display = "none"; }
 
-// ID da planilha Google
-const PLANILHA_JSON = "https://spreadsheets.google.com/feeds/list/1IEcz1DiCJlTOrx1PCpUYFf9DzugD2YI6z0g4U50ERK0/od6/public/values?alt=json";
-
-// Função para criar os cards
+// Função para criar card
 function createCard(viagem){
   if(viagem.Ativo !== "SIM") return;
 
@@ -49,78 +45,41 @@ function createCard(viagem){
   card.classList.add('viagem-card');
 
   card.innerHTML = `
-    <img src="${viagem.Imagem}" alt="${viagem.Destino}">
+    <img src="imagens/${viagem['Imagem Principal']}" alt="${viagem.Destino}">
     <h3>${viagem.Destino}</h3>
-    <p>${viagem.Descricao}</p>
-    <p>${viagem.DataInicio} - ${viagem.DataFim}</p>
-    <a href="https://wa.me/55?text=${encodeURIComponent(viagem.MensagemWhatsApp)}" target="_blank">WhatsApp</a>
+    <p>${viagem['Descrição Curta']}</p>
+    <p>${viagem['Data Início']} - ${viagem['Data Fim']}</p>
+    <a href="https://wa.me/55?text=${encodeURIComponent(viagem['Mensagem WhatsApp'])}" target="_blank">WhatsApp</a>
   `;
 
-  // Abrir modal com primeira imagem da galeria
+  // Modal da galeria
   card.querySelector('img').onclick = () => {
-    const galeria = viagem.Galeria ? viagem.Galeria.split(",") : [viagem.Imagem];
-    modalImg.src = galeria[0];
+    const galeria = viagem.Galeria ? viagem.Galeria.split(",") : [viagem['Imagem Principal']];
+    modalImg.src = `imagens/${galeria[0].trim()}`;
     modal.style.display = "block";
   }
 
   viagensContainer.appendChild(card);
 }
 
-// Carregar dados da planilha
+// Carregar CSV da planilha publicada
 async function carregarViagens(){
   try {
-    const response = await fetch(PLANILHA_JSON);
-    if(!response.ok) throw new Error("Erro ao acessar a planilha");
-    const data = await response.json();
-
-    const entries = data.feed.entry;
-
-    const viagens = entries.map(e => ({
-      ID: e.gsx$id.$t,
-      Ativo: e.gsx$ativo.$t,
-      Categoria: e.gsx$categoria.$t,
-      Destino: e.gsx$destino.$t,
-      DataInicio: e.gsx$datainicio.$t,
-      DataFim: e.gsx$datafim.$t,
-      Descricao: e.gsx$descricaocurta.$t,
-      Imagem: e.gsx$imagemprincipal.$t,
-      Galeria: e.gsx$galeria.$t,
-      MensagemWhatsApp: e.gsx$mensagemwhatsapp.$t,
-      Destaque: e.gsx$destaque.$t
-    }));
-
+    const response = await fetch("https://docs.google.com/spreadsheets/d/1IEcz1DiCJlTOrx1PCpUYFf9DzugD2YI6z0g4U50ERK0/pub?output=csv");
+    const csvText = await response.text();
+    const linhas = csvText.trim().split("\n");
+    const headers = linhas[0].split(",");
+    const viagens = linhas.slice(1).map(linha => {
+      const cols = linha.split(",");
+      const obj = {};
+      cols.forEach((v, i) => obj[headers[i]] = v);
+      return obj;
+    });
     viagens.forEach(createCard);
-
-  } catch(error) {
-    console.error("Não foi possível carregar os pacotes da planilha:", error);
-    viagensContainer.innerHTML = "<p>Não foi possível carregar os pacotes da planilha. Mostrando exemplos locais:</p>";
-
-    // fallback local
-    const exemplos = [
-      {
-        Ativo: "SIM",
-        Destino: "Turquia & Grécia",
-        Descricao: "Istambul, Capadócia e Ilhas Gregas",
-        DataInicio: "03/05/2026",
-        DataFim: "17/05/2026",
-        Imagem: "imagens/turquia-1.jpg",
-        Galeria: "imagens/turquia-1.jpg,imagens/turquia-2.jpg,imagens/turquia-3.jpg",
-        MensagemWhatsApp: "Tenho interesse em Turquia & Grécia"
-      },
-      {
-        Ativo: "SIM",
-        Destino: "Natal Luz",
-        Descricao: "Gramado e Serra Gaúcha",
-        DataInicio: "08/11/2026",
-        DataFim: "17/11/2026",
-        Imagem: "imagens/gramado-1.jpg",
-        Galeria: "imagens/gramado-1.jpg,imagens/gramado-2.jpg",
-        MensagemWhatsApp: "Quero informações sobre Natal Luz"
-      }
-    ];
-    exemplos.forEach(createCard);
+  } catch (err) {
+    console.error("Erro ao carregar os pacotes:", err);
+    viagensContainer.innerHTML = "<p>Não foi possível carregar os pacotes da planilha.</p>";
   }
 }
 
-// Executa ao carregar a página
 carregarViagens();
