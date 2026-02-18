@@ -1,54 +1,36 @@
-/* Reset básico */
-* {
+body {
   margin: 0;
-  padding: 0;
-  box-sizing: border-box;
   font-family: Arial, sans-serif;
 }
 
-body {
-  background-color: #fafafa;
-  color: #333;
+/* Banner do cabeçalho */
+.cabecalho {
+  width: 100%;         /* ocupa toda a largura da página */
+  height: auto;        /* mantém a proporção */
+  max-height: 341px;   /* altura 1/3 do original, ajuste se necessário */
+  object-fit: cover;   /* garante que o banner preencha sem distorcer */
+  display: block;
 }
 
-/* Cabeçalho 1/3 da tela */
-header {
-  width: 100%;
-  height: 33vh; /* 1/3 da altura da tela */
-  overflow: hidden;
+/* Container dos destinos */
+#viagens-container {
   display: flex;
-  justify-content: center;
-  align-items: center;
-  background-color: #f5f5f5;
-}
-
-header img.cabecalho-img {
-  max-height: 100%;
-  width: auto;
-  object-fit: contain;
-}
-
-/* Título */
-h1 {
-  text-align: center;
-  margin: 20px 0;
-}
-
-/* Grid de pacotes */
-.grid-container {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
+  flex-wrap: wrap;
+  justify-content: space-between;
   padding: 20px;
+  gap: 20px; /* espaço entre cards */
 }
 
-/* Card do pacote */
+/* Card de destino */
 .viagem-card {
-  background-color: #fff;
+  flex: 1 1 calc(25% - 20px); /* 4 cards por linha, considerando o gap */
+  box-sizing: border-box;
+  border: 1px solid #ccc;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
-  transition: transform 0.2s;
+  background-color: #fff;
+  text-align: center;
+  transition: transform 0.3s;
 }
 
 .viagem-card:hover {
@@ -59,37 +41,13 @@ h1 {
   width: 100%;
   height: 180px;
   object-fit: cover;
-  cursor: pointer;
 }
 
-.viagem-card .info {
-  padding: 15px;
-}
-
-.viagem-card h2 {
-  font-size: 1.2rem;
-  margin-bottom: 5px;
+.viagem-card h3 {
+  margin: 10px 0 5px 0;
 }
 
 .viagem-card p {
+  padding: 0 10px 10px 10px;
   font-size: 0.9rem;
-  margin-bottom: 8px;
-}
-
-.whatsapp-btn {
-  display: inline-block;
-  padding: 8px 12px;
-  background-color: #25d366;
-  color: #fff;
-  text-decoration: none;
-  border-radius: 4px;
-  font-weight: bold;
-}
-
-/* Modal da galeria */
-#gallery-modal img {
-  display: block;
-  margin: 0 auto;
-  max-width: 90%;
-  max-height: 80%;
 }

@@ -1,4 +1,6 @@
 const viagensContainer = document.getElementById('viagens-container');
+
+// Criação do modal
 const modal = document.createElement('div');
 const modalImg = document.createElement('img');
 const closeBtn = document.createElement('span');
@@ -7,14 +9,18 @@ modal.id = "gallery-modal";
 modal.style.display = "none";
 modal.style.position = "fixed";
 modal.style.zIndex = "1000";
-modal.style.paddingTop = "60px";
 modal.style.left = "0";
 modal.style.top = "0";
 modal.style.width = "100%";
 modal.style.height = "100%";
 modal.style.overflow = "auto";
 modal.style.backgroundColor = "rgba(0,0,0,0.8)";
-modal.appendChild(modalImg);
+modal.style.paddingTop = "60px";
+
+modalImg.style.display = "block";
+modalImg.style.margin = "0 auto";
+modalImg.style.maxWidth = "90%";
+modalImg.style.maxHeight = "80%";
 
 closeBtn.innerHTML = "&times;";
 closeBtn.style.position = "absolute";
@@ -23,16 +29,19 @@ closeBtn.style.right = "35px";
 closeBtn.style.color = "#fff";
 closeBtn.style.fontSize = "40px";
 closeBtn.style.cursor = "pointer";
-modal.appendChild(closeBtn);
 
+modal.appendChild(modalImg);
+modal.appendChild(closeBtn);
 document.body.appendChild(modal);
 
+// Fechar modal
 closeBtn.onclick = () => modal.style.display = "none";
 window.onclick = e => { if(e.target === modal) modal.style.display = "none"; }
 
-// URL JSON da sua planilha publicada
+// ID da planilha Google
 const PLANILHA_JSON = "https://spreadsheets.google.com/feeds/list/1IEcz1DiCJlTOrx1PCpUYFf9DzugD2YI6z0g4U50ERK0/od6/public/values?alt=json";
 
+// Função para criar os cards
 function createCard(viagem){
   if(viagem.Ativo !== "SIM") return;
 
@@ -41,14 +50,13 @@ function createCard(viagem){
 
   card.innerHTML = `
     <img src="${viagem.Imagem}" alt="${viagem.Destino}">
-    <div class="info">
-      <h2>${viagem.Destino}</h2>
-      <p>${viagem.Descricao}</p>
-      <p>${viagem.DataInicio} - ${viagem.DataFim}</p>
-      <a href="https://wa.me/55?text=${encodeURIComponent(viagem.MensagemWhatsApp)}" target="_blank" class="whatsapp-btn">WhatsApp</a>
-    </div>
+    <h3>${viagem.Destino}</h3>
+    <p>${viagem.Descricao}</p>
+    <p>${viagem.DataInicio} - ${viagem.DataFim}</p>
+    <a href="https://wa.me/55?text=${encodeURIComponent(viagem.MensagemWhatsApp)}" target="_blank">WhatsApp</a>
   `;
 
+  // Abrir modal com primeira imagem da galeria
   card.querySelector('img').onclick = () => {
     const galeria = viagem.Galeria ? viagem.Galeria.split(",") : [viagem.Imagem];
     modalImg.src = galeria[0];
@@ -58,6 +66,7 @@ function createCard(viagem){
   viagensContainer.appendChild(card);
 }
 
+// Carregar dados da planilha
 async function carregarViagens(){
   try {
     const response = await fetch(PLANILHA_JSON);
@@ -86,6 +95,7 @@ async function carregarViagens(){
     console.error("Não foi possível carregar os pacotes da planilha:", error);
     viagensContainer.innerHTML = "<p>Não foi possível carregar os pacotes da planilha. Mostrando exemplos locais:</p>";
 
+    // fallback local
     const exemplos = [
       {
         Ativo: "SIM",
@@ -112,4 +122,5 @@ async function carregarViagens(){
   }
 }
 
+// Executa ao carregar a página
 carregarViagens();
